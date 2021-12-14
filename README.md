@@ -42,7 +42,8 @@ This tap:
         "start_date": "2010-01-01",
         "api_key": "<Chargebee API Key>",
         "site": "<Chargebee Site>",
-        "product_catalog": "1.0"
+        "product_catalog": "1.0",
+        "schemaless": True
     }
     ```
 
@@ -54,6 +55,8 @@ This tap:
    The `site` parameter represents the name of your specific Chargebee site (e.g. `https://{site}.chargebee.com/api/v2/subscriptions`)
 
    The `product_catalog` is which Chargebee product catalog to use. Valid arguments are `1.0` or `2.0`
+   
+   The `schemaless` variable to pull data without aligning with input schema 
 
 4. Run the Tap in Discovery Mode
 
