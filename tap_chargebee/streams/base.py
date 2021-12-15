@@ -122,6 +122,7 @@ class BaseChargebeeStream(BaseStream):
         api_method = self.API_METHOD
         done = False
         synced_records = 0
+        params = {}
 
         # Attempt to get the bookmark date from the state file (if one exists and is supplied).
         LOGGER.info(
@@ -147,17 +148,20 @@ class BaseChargebeeStream(BaseStream):
 
         # Create params for filtering
         if self.ENTITY == "event":
-            params = {"occurred_at[after]": bookmark_date_posix}
             bookmark_key = "occurred_at"
+            params["occurred_at[after]"] = bookmark_date_posix
+            params["sort_by[asc]"] = bookmark_key
         elif self.ENTITY == "promotional_credit":
-            params = {"created_at[after]": bookmark_date_posix}
             bookmark_key = "created_at"
+            params["created_at[after]"] = bookmark_date_posix
         elif self.ENTITY == "unbilled_charge":
-            params = {}
             bookmark_key = None
         else:
-            params = {"updated_at[after]": bookmark_date_posix}
             bookmark_key = "updated_at"
+            params["updated_at[after]"] = bookmark_date_posix
+            params["sort_by[asc]"] = bookmark_key
+
+
 
         LOGGER.info("Querying {} starting at {}".format(table, bookmark_date))
 
