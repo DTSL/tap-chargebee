@@ -161,11 +161,7 @@ class BaseChargebeeStream(BaseStream):
             params["updated_at[after]"] = bookmark_date_posix
             params["sort_by[asc]"] = bookmark_key
 
-
-
         LOGGER.info("Querying {} starting at {}".format(table, bookmark_date))
-
-
 
         while not done:
             max_date = bookmark_date
@@ -234,6 +230,9 @@ class BaseChargebeeStream(BaseStream):
                 params["offset"] = response.get("next_offset")
                 bookmark_date = max_date
 
-            if done or synced_records % self.config.get("state_message_threshold", 500) == 0:
-                LOGGER.info('Syncd %s records for %s', synced_records, self.TABLE)
+            if (
+                done
+                or synced_records % self.config.get("state_message_threshold", 500) == 0
+            ):
+                LOGGER.info("Syncd %s records for %s", synced_records, self.TABLE)
                 save_state(self.state)
