@@ -43,7 +43,8 @@ This tap:
         "api_key": "<Chargebee API Key>",
         "site": "<Chargebee Site>",
         "product_catalog": "1.0",
-        "schemaless": True
+        "schemaless": true,
+        "state_message_threshold": 500
     }
     ```
 
@@ -57,6 +58,8 @@ This tap:
    The `product_catalog` is which Chargebee product catalog to use. Valid arguments are `1.0` or `2.0`
    
    The `schemaless` variable to pull data without aligning with input schema 
+
+   The `state_message_threshold` generate a STATE message every N records 
 
 4. Run the Tap in Discovery Mode
 

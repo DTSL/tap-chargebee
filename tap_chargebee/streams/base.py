@@ -226,4 +226,5 @@ class BaseChargebeeStream(BaseStream):
                 params["offset"] = response.get("next_offset")
                 bookmark_date = max_date
 
-        save_state(self.state)
+            if done or singer.metrics.record_counter(endpoint=table).value % self.config.get("state_message_threshold", 500) == 0:
+                save_state(self.state)
