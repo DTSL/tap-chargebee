@@ -121,6 +121,7 @@ class BaseChargebeeStream(BaseStream):
         table = self.TABLE
         api_method = self.API_METHOD
         done = False
+        synced_records = 0
 
         # Attempt to get the bookmark date from the state file (if one exists and is supplied).
         LOGGER.info(
@@ -160,6 +161,8 @@ class BaseChargebeeStream(BaseStream):
 
         LOGGER.info("Querying {} starting at {}".format(table, bookmark_date))
 
+
+
         while not done:
             max_date = bookmark_date
 
@@ -198,6 +201,7 @@ class BaseChargebeeStream(BaseStream):
                 singer.write_records(table, to_write)
 
                 ctr.increment(amount=len(to_write))
+                synced_records += len(to_write)
 
                 if bookmark_key is not None:
                     for item in to_write:
@@ -226,5 +230,6 @@ class BaseChargebeeStream(BaseStream):
                 params["offset"] = response.get("next_offset")
                 bookmark_date = max_date
 
-            if done or singer.metrics.record_counter(endpoint=table).value % self.config.get("state_message_threshold", 500) == 0:
+            if done or synced_records % self.config.get("state_message_threshold", 500) == 0:
+                LOGGER.info('Syncd %s records for %s', synced_records, self.TABLE)
                 save_state(self.state)
