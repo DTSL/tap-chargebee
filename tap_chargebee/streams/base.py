@@ -146,20 +146,35 @@ class BaseChargebeeStream(BaseStream):
         # Convert bookmarked start date to POSIX.
         bookmark_date_posix = int(bookmark_date.timestamp())
 
+        # TODO add new bookmark parameter : if bookmark_key <> sort_by[key], check if a full process was done
         # Create params for filtering
-        if self.ENTITY == "event":
+        if self.ENTITY in ["addon", "plan", "virtual_bank_account"]:
+            bookmark_key = "updated_at"
+            params["updated_at[after]"] = bookmark_date_posix
+        elif self.ENTITY in ["coupon", "payment_source"]:
+            bookmark_key = "updated_at"
+            params["updated_at[after]"] = bookmark_date_posix
+            params["sort_by[asc]"] = "created_at"
+        elif self.ENTITY == "credit_note":
+            bookmark_key = "updated_at"
+            params["updated_at[after]"] = bookmark_date_posix
+            params["sort_by[asc]"] = "date"
+        elif self.ENTITY == "event":
             bookmark_key = "occurred_at"
             params["occurred_at[after]"] = bookmark_date_posix
-            params["sort_by[asc]"] = bookmark_key
+            params["sort_by[asc]"] = "occurred_at"
+        elif self.ENTITY in ["gift", "unbilled_charge"]:
+            bookmark_key = None
+        elif self.ENTITY in ["customer", "invoice", "item_price", "item", "order", "subscription", "transaction"]:
+            bookmark_key = "updated_at"
+            params["updated_at[after]"] = bookmark_date_posix
+            params["sort_by[asc]"] = "updated_at"
         elif self.ENTITY == "promotional_credit":
             bookmark_key = "created_at"
             params["created_at[after]"] = bookmark_date_posix
-        elif self.ENTITY == "unbilled_charge":
-            bookmark_key = None
+
         else:
-            bookmark_key = "updated_at"
-            params["updated_at[after]"] = bookmark_date_posix
-            params["sort_by[asc]"] = bookmark_key
+            LOGGER.error("Unexpected entity {}".format(self.ENTITY))
 
         LOGGER.info("Querying {} starting at {}".format(table, bookmark_date))
 
