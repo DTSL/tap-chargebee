@@ -165,6 +165,10 @@ class BaseChargebeeStream(BaseStream):
             params["sort_by[asc]"] = "occurred_at"
         elif self.ENTITY in ["gift", "unbilled_charge"]:
             bookmark_key = None
+        elif self.TABLE in ["transactions_without_update"]:
+            bookmark_key = "date"
+            params["date[after]"] = bookmark_date_posix
+            params["sort_by[asc]"] = "date"
         elif self.ENTITY in ["customer", "invoice", "item_price", "item", "order", "subscription", "transaction"]:
             bookmark_key = "updated_at"
             params["updated_at[after]"] = bookmark_date_posix
@@ -194,6 +198,11 @@ class BaseChargebeeStream(BaseStream):
 
             to_write = self.get_stream_data(records)
 
+            # Filter some records
+            if self.TABLE in ["transactions_without_update"]:
+                to_write = [record for record in to_write if "updated_at" not in record]
+
+            # Append sub fileds
             if self.ENTITY == "event":
                 for event in to_write:
                     if event["event_type"] == "plan_deleted":

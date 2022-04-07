@@ -6,8 +6,6 @@ import tap_chargebee.streams
 LOGGER = singer.get_logger()
 
 
-class ChargebeeRunner(tap_framework.Runner):
-    pass
 
 
 @singer.utils.handle_top_exception(LOGGER)
@@ -41,7 +39,7 @@ def main():
             else tap_chargebee.streams.AVAILABLE_STREAMS_1_0
         )
 
-    runner = ChargebeeRunner(args, client, available_streams)
+    runner = tap_framework.Runner(args, client, available_streams)
 
     if args.discover:
         runner.do_discover()
